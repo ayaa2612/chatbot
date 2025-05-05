@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="A friendly and interactive medical support chatbot." />
+    <meta name="keywords" content="Medical Chatbot, Healthcare, Support" />
+    <meta name="author" content="Your Name" />
+    <title>Medical Chatbot</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            transition: background 0.5s ease-in-out;
+        }
+
+        body.light-mode {
+            background: linear-gradient(135deg, #f5f7fa, #c3cfe2);
+            color: #000;
+        }
+
+        body.dark-mode {
+            background: linear-gradient(135deg, #2c3e50, #4c5c68);
+            color: #fff;
+        }
+
+        .container {
+            width: 450px;
+            background: #ffffff;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            border-radius: 15px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: background 0.5s ease-in-out, color 0.5s ease-in-out;
+        }
+
+        body.dark-mode .container {
+            background: #3a3a3a;
+        }
+
+        h1 {
+            text-align: center;
+            background: #00796b;
+            color: #ffffff;
+            margin: 0;
+            padding: 20px;
+            font-size: 24px;
+            letter-spacing: 1px;
+            border-bottom: 5px solid #004d40;
+        }
+
+        body.dark-mode h1 {
+            background: #1e282d;
+            border-bottom-color: #2c3e50;
+        }
+
+        .chat-box {
+            flex: 1;
+            padding: 20px;
+            height: 400px;
+            overflow-y: auto;
+            background: #f5f7fa;
+            display: flex;
+            flex-direction: column;
+        }
+
+        body.dark-mode .chat-box {
+            background: #2c3e50;
+        }
+
+        .chat-box p {
+            margin: 10px 0;
+            line-height: 1.4;
+            opacity: 0;
+            animation: fadeIn 0.5s forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background: #a7ffeb;
+            color: #004d40;
+            padding: 10px 15px;
+            border-radius: 20px 20px 0 20px;
+            max-width: 70%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background: #e3f2fd;
+            color: #0d47a1;
+            padding: 10px 15px;
+            border-radius: 20px 20px 20px 0;
+            max-width: 70%;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        body.dark-mode .user-message {
+            background: #4caf50;
+            color: #ffffff;
+        }
+
+        body.dark-mode .bot-message {
+            background: #1e282d;
+            color: #ffffff;
+        }
+
+        form {
+            display: flex;
+            padding: 20px;
+            background: #ffffff;
+            border-top: 1px solid #ddd;
+        }
+
+        body.dark-mode form {
+            background: #3a3a3a;
+            border-top: 1px solid #2c3e50;
+        }
+
+        form input[type="text"] {
+            flex: 1;
+            padding: 15px;
+            font-size: 14px;
+            border: 1px solid #ddd;
+            border-radius: 30px;
+            outline: none;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        form input[type="text"]:focus {
+            border-color: #00796b;
+        }
+
+        body.dark-mode form input[type="text"] {
+            border-color: #2c3e50;
+            background: #555;
+            color: #fff;
+        }
+
+        form button {
+            padding: 15px 20px;
+            font-size: 14px;
+            border: none;
+            background: #00796b;
+            color: white;
+            cursor: pointer;
+            border-radius: 30px;
+            margin-left: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+
+        form button:hover {
+            background: #004d40;
+        }
+
+        body.dark-mode form button {
+            background: #2c3e50;
+        }
+
+        .dark-mode-toggle {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            cursor: pointer;
+            background: #00796b;
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 30px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+
+        .dark-mode-toggle:hover {
+            background: #004d40;
+        }
+
+        body.dark-mode .dark-mode-toggle {
+            background: #2c3e50;
+            color: #ffffff;
+        }
+    </style>
+</head>
+<body class="light-mode">
+    <button class="dark-mode-toggle" id="dark-mode-toggle">Toggle Dark Mode</button>
+    <div class="container">
+        <h1>Medical Support Chatbot</h1>
+        <div class="chat-box" id="chat-box"></div>
+        <form id="chat-form">
+            <input type="text" id="user-input" placeholder="Ask me something..." autocomplete="off" required />
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        // Toggle dark mode
+        const body = document.body;
+        const toggle = document.getElementById('dark-mode-toggle');
+
+        if (localStorage.getItem('theme') === 'dark') {
+            body.classList.add('dark-mode');
+            body.classList.remove('light-mode');
+        }
+
+        toggle.addEventListener('click', () => {
+            body.classList.toggle('dark-mode');
+            body.classList.toggle('light-mode');
+            localStorage.setItem('theme', body.classList.contains('dark-mode') ? 'dark' : 'light');
+        });
+
+        // Chat interaction
+        document.getElementById('chat-form').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const userInput = document.getElementById('user-input').value.trim();
+            if (userInput === '') return;
+
+            const chatBox = document.getElementById('chat-box');
+            const userMessage = `<p class="user-message"><strong>You:</strong> ${userInput}</p>`;
+            chatBox.innerHTML += userMessage;
+
+            const typingMessage = document.createElement('p');
+            typingMessage.className = 'bot-message typing';
+            typingMessage.innerHTML = '<strong>Bot:</strong> <em>Typing...</em>';
+            chatBox.appendChild(typingMessage);
+
+            fetch('/get_response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `user_input=${encodeURIComponent(userInput)}`
+            })
+            .then(response => response.text())
+            .then(data => {
+                chatBox.removeChild(typingMessage);
+                const botMessage = `<p class="bot-message"><strong>Bot:</strong> ${data}</p>`;
+                chatBox.innerHTML += botMessage;
+                chatBox.scrollTop = chatBox.scrollHeight;
+                document.getElementById('user-input').value = '';
+            })
+            .catch(() => {
+                chatBox.removeChild(typingMessage);
+                const errorMsg = `<p class="bot-message"><strong>Bot:</strong> Sorry, an error occurred.</p>`;
+                chatBox.innerHTML += errorMsg;
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+[
+    {
+        "pattern": "hi",
+        "response": "Halo! Ada yang bisa saya bantu mengenai kesehatan Anda?"
+    },
+    {
+        "pattern": "demam|suhu",
+        "response": "Jika Anda demam, pastikan Anda cukup istirahat dan minum air putih. Apakah ada gejala lain?"
+    },
+    {
+        "pattern": "pilek",
+        "response": "Untuk batuk dan pilek ringan, istirahat dan konsumsi vitamin sangat membantu."
+    }
+]
